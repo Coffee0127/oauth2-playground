@@ -1,0 +1,12 @@
+logging:
+  level:
+    io.github.coffee0127.oauth2: debug
+
+spring:
+  # Hot swap for local development
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0

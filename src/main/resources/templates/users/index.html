@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -32,9 +32,16 @@
   </nav>
 </header>
 <main class="flex-shrink-0">
-  <div class="container">
-    <h2>Welcome XXX</h2>
-    Please click the menu link to play OAuth 2.0 😉
+  <div class="container d-flex justify-content-center">
+    <div class="text-center">
+      <div>
+        <img class="profile-img" th:src="${idToken.picture}"/>
+      </div>
+      <div>
+        <h2>Welcome <span th:text="${idToken.name}">XXX</span></h2>
+        Please click the menu link to play OAuth 2.0 😉
+      </div>
+    </div>
   </div>
 </main>
 <footer class="footer mt-auto py-3 bg-light">

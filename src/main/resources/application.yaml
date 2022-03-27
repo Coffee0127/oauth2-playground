@@ -1,6 +1,6 @@
 logging:
   level:
-    io.github.coffee0127.oauth2: debug
+    root: info
 
 spring:
   web:

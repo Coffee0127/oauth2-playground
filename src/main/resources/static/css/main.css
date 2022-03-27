@@ -21,3 +21,10 @@ main > .container {
 #web-login-button a:active {
   background: url("../img/line/btn_login_press.png") no-repeat;
 }
+
+.profile-img {
+  width: 100px;
+  height: 100px;
+  max-width: 100%;
+  border-radius: 50%;
+}

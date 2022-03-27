@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/line")
 public class LineController {
 
+  public static final String LINE_ID_TOKEN = "LineController.LINE_ID_TOKEN";
   private static final String LINE_LOGIN_STATE = "LineController.LINE_LOGIN_STATE";
   private static final String LINE_LOGIN_NONCE = "LineController.LINE_LOGIN_NONCE";
   private static final String LINE_ACCESS_TOKEN = "LineController.LINE_ACCESS_TOKEN";
@@ -113,6 +114,7 @@ public class LineController {
       log.debug("pictureUrl : {}", idToken.getPicture());
     }
 
+    session.getAttributes().put(LINE_ID_TOKEN, idToken);
     return RedirectUtils.redirect(response, "/");
   }
 }
