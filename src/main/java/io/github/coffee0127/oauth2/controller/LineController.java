@@ -1,16 +1,19 @@
 package io.github.coffee0127.oauth2.controller;
 
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
+import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
 import io.github.coffee0127.oauth2.service.LineService;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -78,7 +81,7 @@ public class LineController {
               session.getAttributes().remove(LINE_LOGIN_STATE);
               return lineService
                   .getAccessToken(code)
-                  .map(
+                  .flatMap(
                       token -> {
                         if (log.isDebugEnabled()) {
                           log.debug("scope : {}", token.getScope());
@@ -89,9 +92,27 @@ public class LineController {
                           log.debug("id_token : {}", token.getIdToken());
                         }
                         session.getAttributes().put(LINE_ACCESS_TOKEN, token);
-                        return token;
-                      })
-                  .then(RedirectUtils.redirect(exchange.getResponse(), "/"));
+                        return extractUserProfile(session, exchange.getResponse(), token);
+                      });
             });
+  }
+
+  private Mono<Void> extractUserProfile(
+      WebSession session, ServerHttpResponse response, AccessTokenResponse accessToken) {
+    if (!lineService.verifyIdToken(
+        accessToken.getIdToken(), session.getAttribute(LINE_LOGIN_NONCE))) {
+      log.error("id_token is invalid");
+      return RedirectUtils.redirect(response, "/login-failed.html");
+    }
+
+    session.getAttributes().remove(LINE_LOGIN_NONCE);
+    var idToken = lineService.parseIdToken(accessToken.getIdToken());
+    if (log.isDebugEnabled()) {
+      log.debug("userId : {}", idToken.getUserId());
+      log.debug("displayName : {}", idToken.getName());
+      log.debug("pictureUrl : {}", idToken.getPicture());
+    }
+
+    return RedirectUtils.redirect(response, "/");
   }
 }

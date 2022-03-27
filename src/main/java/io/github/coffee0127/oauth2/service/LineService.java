@@ -1,11 +1,16 @@
 package io.github.coffee0127.oauth2.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
+import io.github.coffee0127.oauth2.objects.IdToken;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,5 +93,35 @@ public class LineService {
         .retrieve()
         .bodyToMono(AccessTokenResponse.class)
         .doOnError(throwable -> log.error(throwable.getMessage(), throwable));
+  }
+
+  public boolean verifyIdToken(String idToken, String nonce) {
+    try {
+      JWT.require(Algorithm.HMAC256(channelSecret))
+          .withIssuer("https://access.line.me")
+          .withAudience(channelId)
+          .withClaim("nonce", nonce)
+          // add 60 seconds leeway to handle clock skew between client and server sides.
+          .acceptLeeway(60)
+          .build()
+          .verify(idToken);
+      return true;
+    } catch (JWTVerificationException e) {
+      // Invalid signature/claims
+      return false;
+    }
+  }
+
+  public IdToken parseIdToken(String idToken) {
+    var jwt = JWT.decode(idToken);
+    return new IdToken(
+        jwt.getClaim("iss").asString(),
+        jwt.getClaim("sub").asString(),
+        jwt.getClaim("aud").asString(),
+        Instant.ofEpochSecond(jwt.getClaim("exp").asLong()),
+        Instant.ofEpochSecond(jwt.getClaim("iat").asLong()),
+        jwt.getClaim("nonce").asString(),
+        jwt.getClaim("name").asString(),
+        jwt.getClaim("picture").asString());
   }
 }
