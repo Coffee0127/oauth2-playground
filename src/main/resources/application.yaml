@@ -1,0 +1,10 @@
+logging:
+  level:
+    io.github.coffee0127.oauth2: debug
+
+spring:
+  web:
+    resources:
+      static-locations:
+        - file:src/main/resources/static/
+        - classpath:/static/

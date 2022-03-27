@@ -1,0 +1,23 @@
+main > .container {
+  padding: 60px 15px 0;
+}
+
+.footer {
+  margin-top: 20px !important;
+  min-width: 900px;
+}
+
+#web-login-button a {
+  width: 151px;
+  height: 44px;
+  background: url("../img/line/btn_login_base.png") no-repeat;
+  display: block;
+}
+
+#web-login-button a:hover {
+  background: url("../img/line/btn_login_hover.png") no-repeat;
+}
+
+#web-login-button a:active {
+  background: url("../img/line/btn_login_press.png") no-repeat;
+}
