@@ -7,11 +7,16 @@ main > .container {
   min-width: 900px;
 }
 
+.error {
+  color: darkred;
+}
+
 #web-login-button a {
   width: 151px;
   height: 44px;
   background: url("../img/line/btn_login_base.png") no-repeat;
   display: block;
+  margin: 0 auto;
 }
 
 #web-login-button a:hover {

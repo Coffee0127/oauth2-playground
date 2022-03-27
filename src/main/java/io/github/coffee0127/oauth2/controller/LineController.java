@@ -1,5 +1,6 @@
 package io.github.coffee0127.oauth2.controller;
 
+import io.github.coffee0127.oauth2.constant.ErrorCode;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
 import io.github.coffee0127.oauth2.service.LineService;
@@ -63,7 +64,8 @@ public class LineController {
     if (StringUtils.isNotBlank(errorCode) || StringUtils.isNotBlank(errorMessage)) {
       log.error("parameter errorCode : {}", errorCode);
       log.error("parameter errorMessage : {}", errorMessage);
-      return RedirectUtils.redirect(exchange.getResponse(), "/login-failed.html");
+      return RedirectUtils.redirect(
+          exchange.getResponse(), createRedirectUri(ErrorCode.LOGIN_FAILED_CALLBACK));
     }
 
     return exchange
@@ -76,7 +78,9 @@ public class LineController {
                     "Mismatch state, parameter state : {}, session state : {}",
                     state,
                     sessionState);
-                return RedirectUtils.redirect(exchange.getResponse(), "/login-failed.html");
+                return RedirectUtils.redirect(
+                    exchange.getResponse(),
+                    createRedirectUri(ErrorCode.LOGIN_FAILED_MISMATCH_STATE));
               }
 
               session.getAttributes().remove(LINE_LOGIN_STATE);
@@ -98,12 +102,17 @@ public class LineController {
             });
   }
 
+  private String createRedirectUri(ErrorCode errorCode) {
+    return "/login?error=" + errorCode.getCode();
+  }
+
   private Mono<Void> extractUserProfile(
       WebSession session, ServerHttpResponse response, AccessTokenResponse accessToken) {
     if (!lineService.verifyIdToken(
         accessToken.getIdToken(), session.getAttribute(LINE_LOGIN_NONCE))) {
       log.error("id_token is invalid");
-      return RedirectUtils.redirect(response, "/login-failed.html");
+      return RedirectUtils.redirect(
+          response, createRedirectUri(ErrorCode.LOGIN_FAILED_INVALID_ID_TOKEN));
     }
 
     session.getAttributes().remove(LINE_LOGIN_NONCE);

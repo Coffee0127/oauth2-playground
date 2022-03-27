@@ -10,15 +10,22 @@ import org.springframework.web.server.WebSession;
 @Controller
 public class ViewController {
 
+  private static final String VIEW_USERS_LOGIN = "users/login";
+
   @GetMapping("/")
   public String index(WebSession session, Model model) {
     var idToken = session.getAttribute(LineController.LINE_ID_TOKEN);
     if (idToken == null) {
       log.warn("User hasn't logged in yet.");
-      return "redirect:/login.html";
+      return VIEW_USERS_LOGIN;
     }
 
     model.addAttribute("idToken", idToken);
     return "users/index";
+  }
+
+  @GetMapping("/login")
+  public String login() {
+    return VIEW_USERS_LOGIN;
   }
 }
