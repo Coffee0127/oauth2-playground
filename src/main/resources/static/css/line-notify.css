@@ -1,0 +1,22 @@
+.container .row + .row {
+  margin-top: 0.5rem;
+}
+
+button {
+  width: 100px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
+}
+
+tr.deleted th,
+tr.deleted td {
+  background: #dc3545;
+  text-decoration: line-through;
+}
+
+.notify-result {
+  color: #6c757d;
+}

@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ErrorCode {
   LOGIN_FAILED_CALLBACK(40100, "Login failed - Call back with error."),
   LOGIN_FAILED_MISMATCH_STATE(40101, "Login failed - Mismatch state."),
-  LOGIN_FAILED_INVALID_ID_TOKEN(40102, "Login failed - id_token is invalid.");
+  LOGIN_FAILED_INVALID_ID_TOKEN(40102, "Login failed - id_token is invalid."),
+  AUTH_NOTIFICATION_FAILED_CALLBACK(40103, "Auth Notification failed - Call back with error.");
 
   private final int code;
   private final String errorMessage;

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout::head(~{::title},~{::link},~{::script})">
+  <title>LINE Notify</title>
+  <link rel="stylesheet" th:href="@{/css/line-notify.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/js/line-notify.js" async></script>
+</head>
+<body th:replace="layout::body(~{::.container})">
+<div class="container">
+  <div class="row">
+    <table id="registrations" class="table caption-top">
+      <caption>Notification Registrations</caption>
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Type</th>
+        <th scope="col">Target</th>
+        <th scope="col">Operation</th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-2">
+      <button type="button" class="register-btn btn btn-success notify-button">Register</button>
+    </div>
+    <p class="error" th:if="${param.error}">Register failed<th:block th:if="${param.errorMsg}" th:text="' because ' + ${param.errorMsg}"/>.
+  </div>
+</div>
+</body>
+</html>

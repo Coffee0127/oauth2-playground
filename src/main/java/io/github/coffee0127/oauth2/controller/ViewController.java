@@ -14,6 +14,20 @@ public class ViewController {
 
   @GetMapping("/")
   public String index(WebSession session, Model model) {
+    return processView(session, model, "users/index");
+  }
+
+  @GetMapping("/login")
+  public String login() {
+    return VIEW_USERS_LOGIN;
+  }
+
+  @GetMapping("/line-notify")
+  public String lineNotify(WebSession session, Model model) {
+    return processView(session, model, "users/line-notify");
+  }
+
+  private String processView(WebSession session, Model model, String dest) {
     var idToken = session.getAttribute(LineController.LINE_ID_TOKEN);
     if (idToken == null) {
       log.warn("User hasn't logged in yet.");
@@ -21,11 +35,6 @@ public class ViewController {
     }
 
     model.addAttribute("idToken", idToken);
-    return "users/index";
-  }
-
-  @GetMapping("/login")
-  public String login() {
-    return VIEW_USERS_LOGIN;
+    return dest;
   }
 }
