@@ -95,6 +95,20 @@ public class LineService {
         .doOnError(throwable -> log.error(throwable.getMessage(), throwable));
   }
 
+  public Mono<Void> revoke(String accessToken) {
+    var formData = new LinkedMultiValueMap<>();
+    formData.add("access_token", accessToken);
+    formData.add("client_id", channelId);
+    formData.add("client_secret", channelSecret);
+    return webClient
+        .post()
+        .uri("/revoke")
+        .bodyValue(formData)
+        .retrieve()
+        .bodyToMono(Void.class)
+        .doOnError(throwable -> log.error(throwable.getMessage(), throwable));
+  }
+
   public boolean verifyIdToken(String idToken, String nonce) {
     try {
       JWT.require(Algorithm.HMAC256(channelSecret))

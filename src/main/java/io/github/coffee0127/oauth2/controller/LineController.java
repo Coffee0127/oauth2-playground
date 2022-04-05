@@ -4,6 +4,7 @@ import io.github.coffee0127.oauth2.constant.ErrorCode;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
 import io.github.coffee0127.oauth2.service.LineService;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,21 @@ public class LineController {
               return redirectUri;
             })
         .flatMap(redirectUri -> RedirectUtils.redirect(exchange.getResponse(), redirectUri));
+  }
+
+  @GetMapping("/logout")
+  public Mono<Void> logout(ServerWebExchange exchange) {
+    return exchange
+        .getSession()
+        .flatMap(
+            session ->
+                Mono.justOrEmpty(
+                        Optional.ofNullable(
+                                session.<AccessTokenResponse>getAttribute(LINE_ACCESS_TOKEN))
+                            .map(AccessTokenResponse::getAccessToken))
+                    .flatMap(lineService::revoke)
+                    .then(session.invalidate()))
+        .then(RedirectUtils.redirect(exchange.getResponse(), "/login"));
   }
 
   @GetMapping("/auth")
