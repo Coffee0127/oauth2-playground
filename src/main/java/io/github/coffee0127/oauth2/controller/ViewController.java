@@ -11,6 +11,7 @@ import org.springframework.web.server.WebSession;
 public class ViewController {
 
   private static final String VIEW_USERS_LOGIN = "users/login";
+  private static final String REDIRECT_TO_INDEX = "redirect:/";
 
   @GetMapping("/")
   public String index(WebSession session, Model model) {
@@ -18,8 +19,19 @@ public class ViewController {
   }
 
   @GetMapping("/login")
-  public String login() {
+  public String login(WebSession session) {
+    if (session.getAttribute(LineController.LINE_ID_TOKEN) != null) {
+      return REDIRECT_TO_INDEX;
+    }
     return VIEW_USERS_LOGIN;
+  }
+
+  @GetMapping("/unauthorized")
+  public String unauthorized(WebSession session) {
+    if (session.getAttribute(LineController.LINE_ID_TOKEN) != null) {
+      return REDIRECT_TO_INDEX;
+    }
+    return "unauthorized";
   }
 
   @GetMapping("/line-notify")

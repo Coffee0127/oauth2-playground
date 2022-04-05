@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout::head(~{::title},_,_)">
+  <title>OAuth 2.0 Playground</title>
+</head>
+<body th:replace="layout::body(~{::.container})">
+<div class="container d-flex justify-content-center">
+  <div class="text-center">
+    <div>
+      <h3>You're not logged in yet.</h3>
+      <h3> Will redirect to <a href="/login">login page</a> after <span>5 seconds</span>.</h3>
+    </div>
+  </div>
+  <script>
+    let begin = 5;
+    const msg = document.querySelector('h3 > span');
+    const timer = setInterval(() => {
+      msg.innerHTML = `${--begin} seconds`
+
+      if (begin === 0) {
+        clearInterval(timer);
+        window.location.href = '/login';
+      }
+    }, 1000);
+  </script>
+</div>
+</body>
+</html>
