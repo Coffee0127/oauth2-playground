@@ -8,8 +8,9 @@ import io.github.coffee0127.oauth2.objects.RegistrationKey;
 import io.github.coffee0127.oauth2.service.LineNotifyService;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -41,8 +41,8 @@ public class LineNotifyController {
   private static final String LINE_NOTIFY_STATE = "LineNotifyController.LINE_NOTIFY_STATE";
 
   // TODO temp workaround for resolving state mismatched when using `form_post` response.
-  //  key is userId, value is previous state.
-  private static final ThreadLocal<Pair<String, String>> STATES = new ThreadLocal<>();
+  //  key is previous state, value is userId.
+  private static final Map<String, String> STATES = new HashMap<>();
 
   private final LineNotifyService notifyService;
 
@@ -62,7 +62,7 @@ public class LineNotifyController {
   public Mono<Void> register(WebSession session, ServerHttpResponse response) {
     var state = UUID.randomUUID().toString();
     session.getAttributes().put(LINE_NOTIFY_STATE, state);
-    STATES.set(Pair.of(getUserId(session), state));
+    STATES.put(state, getUserId(session));
     var redirectUri = notifyService.getRedirectUri(state);
     log.debug("redirectUri = {}", redirectUri);
     return RedirectUtils.redirect(response, redirectUri);
@@ -87,19 +87,17 @@ public class LineNotifyController {
       return RedirectUtils.redirect(response, createErrorRedirectUri(errorMessage));
     }
 
-    var userId = getUserId(session);
-    var prevState =
-        Optional.ofNullable(session.<String>getAttribute(LINE_NOTIFY_STATE))
-            .orElseGet(() -> STATES.get().getRight());
-    if (StringUtils.isNotBlank(state) && !StringUtils.equals(state, prevState)) {
+    var prevState = session.<String>getAttribute(LINE_NOTIFY_STATE);
+    var matchSessionState = StringUtils.isNotBlank(state) && StringUtils.equals(state, prevState);
+    if (!STATES.containsKey(state) && !matchSessionState) {
       log.error("Mismatch state, parameter state : {}, previous state : {}", state, prevState);
       return RedirectUtils.redirect(response, createErrorRedirectUri());
     }
 
     session.getAttributes().remove(LINE_NOTIFY_STATE);
-    STATES.remove();
     return notifyService
-        .register(userId, code)
+        .register(STATES.get(state), code)
+        .then(Mono.fromRunnable(() -> STATES.remove(state)))
         .then(RedirectUtils.redirect(response, "/line-notify"));
   }
 
@@ -146,10 +144,9 @@ public class LineNotifyController {
   }
 
   private String getUserId(WebSession session) {
-    return Objects.requireNonNull(
-        Optional.ofNullable(session.<IdToken>getAttribute(LineController.LINE_ID_TOKEN))
-            .map(IdToken::getUserId)
-            .orElseGet(() -> STATES.get().getLeft()));
+    return Optional.ofNullable(session.<IdToken>getAttribute(LineController.LINE_ID_TOKEN))
+        .map(IdToken::getUserId)
+        .orElseThrow(() -> new IllegalStateException("Cannot find User ID from session."));
   }
 
   private String createErrorRedirectUri() {
