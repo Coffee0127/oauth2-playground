@@ -1,0 +1,31 @@
+{
+  "name": "OAuth 2.0 PlayGround",
+  "description": "Toy Application for OAuth 2.0",
+  "repository": "https://github.com/Coffee0127/oauth2-playground.git",
+  "env": {
+    "LINE_CHANNELID": {
+      "description": "LINE Channel ID",
+      "required": true
+    },
+    "LINE_CHANNELSECRET": {
+      "description": "LINE Channel secret",
+      "required": true
+    },
+    "LINE_CALLBACKURL": {
+      "description": "LINE Callback URL",
+      "required": true
+    },
+    "LINE_NOTIFY_CLIENTID": {
+      "description": "LINE Notify Client ID",
+      "required": true
+    },
+    "LINE_NOTIFY_CLIENTSECRET": {
+      "description": "LINE Notify Client secret",
+      "required": true
+    },
+    "LINE_NOTIFY_CALLBACKURL": {
+      "description": "LINE Notify Callback URL",
+      "required": true
+    }
+  }
+}
