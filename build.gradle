@@ -39,3 +39,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// Heroku favor Gradle task
+bootJar.mustRunAfter clean
+task stage(dependsOn: ['bootJar', 'clean'])
