@@ -9,7 +9,7 @@ public interface RegistrationDao {
 
   Mono<List<Registration>> findRegistrations(String userId);
 
-  Mono<Void> saveRegistration(Registration registration);
+  Mono<Registration> saveRegistration(Registration registration);
 
   Mono<Registration> getRegistration(RegistrationKey registrationKey);
 

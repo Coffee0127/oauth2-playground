@@ -27,7 +27,7 @@ public class LineNotifyService {
     return client.getRedirectUri(state);
   }
 
-  public Mono<Void> register(String userId, String code) {
+  public Mono<Registration> register(String userId, String code) {
     return client
         .getAccessToken(code)
         .doOnSuccess(accessToken -> log.debug("Get {} accessToken {}", userId, accessToken))

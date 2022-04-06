@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.coffee0127.oauth2.objects.Registration;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,14 +42,16 @@ public class CaffeineRegistrationDao implements RegistrationDao {
   }
 
   @Override
-  public Mono<Void> saveRegistration(Registration registration) {
-    return Mono.fromRunnable(
+  public Mono<Registration> saveRegistration(Registration registration) {
+    return Mono.fromSupplier(
         () -> {
           var userId = registration.getRegistrationKey().getUserId();
           var registrations =
               Optional.ofNullable(storage.getIfPresent(userId)).orElseGet(HashMap::new);
+          registration.setCreateTime(Instant.now());
           registrations.putIfAbsent(registration.getRegistrationKey(), registration);
           storage.put(userId, registrations);
+          return registration;
         });
   }
 

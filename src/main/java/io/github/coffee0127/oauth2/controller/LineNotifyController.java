@@ -6,6 +6,7 @@ import io.github.coffee0127.oauth2.objects.IdToken;
 import io.github.coffee0127.oauth2.objects.Registration;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
 import io.github.coffee0127.oauth2.service.LineNotifyService;
+import io.github.coffee0127.oauth2.service.ScheduleManager;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ public class LineNotifyController {
   private static final Map<String, String> STATES = new HashMap<>();
 
   private final LineNotifyService notifyService;
+  private final ScheduleManager scheduleManager;
 
   @GetMapping
   public Mono<List<RegistrationKey>> list(WebSession session) {
@@ -97,6 +99,7 @@ public class LineNotifyController {
     session.getAttributes().remove(LINE_NOTIFY_STATE);
     return notifyService
         .register(STATES.get(state), code)
+        .doOnSuccess(scheduleManager::scheduleCleanup)
         .then(Mono.fromRunnable(() -> STATES.remove(state)))
         .then(RedirectUtils.redirect(response, "/line-notify"));
   }
