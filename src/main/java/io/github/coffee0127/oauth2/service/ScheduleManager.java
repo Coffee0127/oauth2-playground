@@ -25,8 +25,9 @@ public class ScheduleManager {
   }
 
   public void scheduleCleanup(Registration registration) {
-    var executionTime = Date.from(registration.getCreateTime().plus(Duration.ofHours(1)));
-    log.info("Schedule cleanup for {} at {}", registration.getRegistrationKey(), executionTime);
+    var expiryTime = registration.getCreateTime().plus(Duration.ofHours(1));
+    registration.setExpiryTime(expiryTime);
+    log.info("Schedule cleanup for {} at {}", registration.getRegistrationKey(), expiryTime);
     timer.schedule(
         new TimerTask() {
           @Override
@@ -41,6 +42,6 @@ public class ScheduleManager {
                 .block();
           }
         },
-        executionTime);
+        Date.from(expiryTime));
   }
 }

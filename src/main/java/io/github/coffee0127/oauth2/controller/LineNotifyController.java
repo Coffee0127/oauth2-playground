@@ -3,7 +3,6 @@ package io.github.coffee0127.oauth2.controller;
 import io.github.coffee0127.oauth2.constant.ErrorCode;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import io.github.coffee0127.oauth2.objects.IdToken;
-import io.github.coffee0127.oauth2.objects.Registration;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
 import io.github.coffee0127.oauth2.service.LineNotifyService;
 import io.github.coffee0127.oauth2.service.ScheduleManager;
@@ -17,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -49,14 +49,18 @@ public class LineNotifyController {
   private final ScheduleManager scheduleManager;
 
   @GetMapping
-  public Mono<List<RegistrationKey>> list(WebSession session) {
+  public Mono<List<RegistrationResponse>> list(WebSession session) {
     return notifyService
         .findRegistrations(getUserId(session))
         .map(
             registrations ->
                 registrations.stream()
-                    .map(Registration::getRegistrationKey)
-                    .map(registrationKey -> registrationKey.setUserId(null))
+                    .map(
+                        registration ->
+                            new RegistrationResponse()
+                                .setTargetType(registration.getRegistrationKey().getTargetType())
+                                .setTarget(registration.getRegistrationKey().getTarget())
+                                .setExpiryTime(registration.getExpiryTime().toEpochMilli()))
                     .collect(Collectors.toList()));
   }
 
@@ -167,5 +171,13 @@ public class LineNotifyController {
     private String type;
     private String target;
     private String msg;
+  }
+
+  @Accessors(chain = true)
+  @Data
+  private static class RegistrationResponse {
+    private String targetType;
+    private String target;
+    private Long expiryTime;
   }
 }

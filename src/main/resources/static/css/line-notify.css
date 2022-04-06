@@ -20,3 +20,7 @@ tr.deleted td {
 .notify-result {
   color: #6c757d;
 }
+
+#timezone {
+  font-size: 0.9rem;
+}

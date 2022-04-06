@@ -12,6 +12,8 @@ public class Registration {
 
   private Instant createTime;
 
+  private Instant expiryTime;
+
   public Registration(RegistrationKey registrationKey, String accessToken) {
     this.registrationKey = registrationKey;
     this.accessToken = accessToken;
@@ -21,5 +23,6 @@ public class Registration {
     this.registrationKey = new RegistrationKey(registration.registrationKey);
     this.accessToken = registration.accessToken;
     this.createTime = registration.createTime;
+    this.expiryTime = registration.expiryTime;
   }
 }

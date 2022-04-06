@@ -3,6 +3,24 @@ $(function () {
     window.location.href = '/api/registrations/register';
   });
 
+  $('#timezone').text(`(${Intl.DateTimeFormat().resolvedOptions().timeZone})`);
+
+  const formatDate = time => {
+    if (!time) {
+      return 'N/A';
+    }
+
+    const lpad = number => number.toString().length < 2 ? `0${number}` : number;
+
+    const d = new Date(time);
+    return `${d.getFullYear()}-${lpad(d.getMonth() + 1)}-${lpad(
+      d.getDate())} ${lpad(d.getHours())}:${lpad(d.getMinutes())}`
+  }
+
+  const cleanup = element =>
+    element.parents('tr').addClass('deleted').end()
+    .parents('td').text('Registration deleted...');
+
   const url = '/api/registrations';
 
   const $registrationsTable = $('#registrations tbody');
@@ -14,9 +32,11 @@ $(function () {
       $tr.append($(document.createElement('td'))
       .addClass('text-center')
       .text('No registrations found')
-      .attr('colspan', 4));
+      .attr('colspan', 5));
       $registrationsTable.append($tr);
     }
+
+    const now = new Date().getTime();
     registrations.forEach((registration, index) => {
       const $tr = $(document.createElement('tr'));
       const seqNo = index + 1;
@@ -24,6 +44,13 @@ $(function () {
         $(document.createElement('th')).text(seqNo).attr('scope', 'row'));
       $tr.append($(document.createElement('td')).text(registration.targetType));
       $tr.append($(document.createElement('td')).text(registration.target));
+      $tr.append($(document.createElement('td')).text(
+        formatDate(registration.expiryTime)));
+      // Register cleanup
+      setTimeout(() => {
+        cleanup($(`#revoke-btn-${seqNo}`));
+      }, registration.expiryTime - now);
+
       $tr.append(`
         <td data-type="${registration.targetType}"
           data-target="${registration.target}">
@@ -92,10 +119,7 @@ $(function () {
           target
         }
       })
-      .done(() => {
-        $this.parents('tr').addClass('deleted').end()
-        .parents('td').text('Registration deleted...');
-      })
+      .done(() => cleanup($this))
     });
   })
 });
