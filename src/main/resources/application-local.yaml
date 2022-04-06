@@ -2,6 +2,14 @@ logging:
   level:
     io.github.coffee0127.oauth2: debug
 
+server:
+  ssl:
+    key-store: ${SSL_KEY_STORE}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD}
+    key-store-type: ${SSL_KEY_STORE_TYPE}
+    key-password: ${SSL_KEY_PASSWORD}
+  port: ${SERVER_PORT:8443}
+
 spring:
   # Hot swap for local development
   thymeleaf:
