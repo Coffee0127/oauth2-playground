@@ -7,10 +7,10 @@
 <div class="container d-flex justify-content-center">
   <div class="text-center">
     <div>
-      <img class="profile-img" th:src="${idToken.picture}"/>
+      <img class="profile-img" th:src="${userPrincipal.picture}"/>
     </div>
     <div>
-      <h2>Welcome <span th:text="${idToken.name}">XXX</span></h2>
+      <h2>Welcome <span th:text="${userPrincipal.name}">XXX</span></h2>
       Please click the menu link to play OAuth 2.0 😉
     </div>
   </div>

@@ -1,9 +1,10 @@
 package io.github.coffee0127.oauth2.controller;
 
 import io.github.coffee0127.oauth2.constant.ErrorCode;
+import io.github.coffee0127.oauth2.constant.OAuth2;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
-import io.github.coffee0127.oauth2.objects.IdToken;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
+import io.github.coffee0127.oauth2.objects.UserPrincipal;
 import io.github.coffee0127.oauth2.service.LineNotifyService;
 import io.github.coffee0127.oauth2.service.ScheduleManager;
 import java.net.URLEncoder;
@@ -151,8 +152,8 @@ public class LineNotifyController {
   }
 
   private String getUserId(WebSession session) {
-    return Optional.ofNullable(session.<IdToken>getAttribute(LineController.LINE_ID_TOKEN))
-        .map(IdToken::getUserId)
+    return Optional.ofNullable(session.<UserPrincipal>getAttribute(OAuth2.USER_PRINCIPAL))
+        .map(UserPrincipal::getUserId)
         .orElseThrow(() -> new IllegalStateException("Cannot find User ID from session."));
   }
 

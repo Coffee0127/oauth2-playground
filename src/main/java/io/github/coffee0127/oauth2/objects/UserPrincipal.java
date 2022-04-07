@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class IdToken {
+public class UserPrincipal {
   private final String issuer;
   private final String userId;
   private final String channelId;

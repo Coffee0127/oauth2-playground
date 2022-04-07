@@ -1,6 +1,7 @@
 package io.github.coffee0127.oauth2.controller;
 
 import io.github.coffee0127.oauth2.constant.ErrorCode;
+import io.github.coffee0127.oauth2.constant.OAuth2;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
 import io.github.coffee0127.oauth2.service.LineService;
@@ -23,7 +24,6 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/line")
 public class LineController {
 
-  public static final String LINE_ID_TOKEN = "LineController.LINE_ID_TOKEN";
   private static final String LINE_LOGIN_STATE = "LineController.LINE_LOGIN_STATE";
   private static final String LINE_LOGIN_NONCE = "LineController.LINE_LOGIN_NONCE";
   private static final String LINE_ACCESS_TOKEN = "LineController.LINE_ACCESS_TOKEN";
@@ -111,14 +111,14 @@ public class LineController {
     }
 
     session.getAttributes().remove(LINE_LOGIN_NONCE);
-    var idToken = lineService.parseIdToken(accessToken.getIdToken());
+    var userPrincipal = lineService.parseIdToken(accessToken.getIdToken());
     if (log.isDebugEnabled()) {
-      log.debug("userId : {}", idToken.getUserId());
-      log.debug("displayName : {}", idToken.getName());
-      log.debug("pictureUrl : {}", idToken.getPicture());
+      log.debug("userId : {}", userPrincipal.getUserId());
+      log.debug("displayName : {}", userPrincipal.getName());
+      log.debug("pictureUrl : {}", userPrincipal.getPicture());
     }
 
-    session.getAttributes().put(LINE_ID_TOKEN, idToken);
+    session.getAttributes().put(OAuth2.USER_PRINCIPAL, userPrincipal);
     return RedirectUtils.redirect(response, "/");
   }
 }

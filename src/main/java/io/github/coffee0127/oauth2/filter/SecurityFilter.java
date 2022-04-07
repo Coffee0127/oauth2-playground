@@ -1,6 +1,6 @@
 package io.github.coffee0127.oauth2.filter;
 
-import io.github.coffee0127.oauth2.controller.LineController;
+import io.github.coffee0127.oauth2.constant.OAuth2;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class SecurityFilter implements WebFilter {
         .getSession()
         .flatMap(
             session -> {
-              if (session.getAttribute(LineController.LINE_ID_TOKEN) == null) {
+              if (session.getAttribute(OAuth2.USER_PRINCIPAL) == null) {
                 log.warn("Unauthorized to access {}", path);
                 return RedirectUtils.redirect(exchange.getResponse(), "/unauthorized");
               }

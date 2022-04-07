@@ -2,7 +2,7 @@ package io.github.coffee0127.oauth2.service;
 
 import com.auth0.jwt.JWT;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
-import io.github.coffee0127.oauth2.objects.IdToken;
+import io.github.coffee0127.oauth2.objects.UserPrincipal;
 import io.github.coffee0127.oauth2.service.client.LineClient;
 import java.net.URI;
 import java.time.Instant;
@@ -33,9 +33,9 @@ public class LineService {
     return client.verifyIdToken(idToken, nonce);
   }
 
-  public IdToken parseIdToken(String idToken) {
+  public UserPrincipal parseIdToken(String idToken) {
     var jwt = JWT.decode(idToken);
-    return new IdToken(
+    return new UserPrincipal(
         jwt.getClaim("iss").asString(),
         jwt.getClaim("sub").asString(),
         jwt.getClaim("aud").asString(),

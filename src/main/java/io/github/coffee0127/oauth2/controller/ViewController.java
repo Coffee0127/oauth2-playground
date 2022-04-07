@@ -1,5 +1,6 @@
 package io.github.coffee0127.oauth2.controller;
 
+import io.github.coffee0127.oauth2.constant.OAuth2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,7 @@ public class ViewController {
 
   @GetMapping("/login")
   public String login(WebSession session) {
-    if (session.getAttribute(LineController.LINE_ID_TOKEN) != null) {
+    if (session.getAttribute(OAuth2.USER_PRINCIPAL) != null) {
       return REDIRECT_TO_INDEX;
     }
     return VIEW_USERS_LOGIN;
@@ -28,7 +29,7 @@ public class ViewController {
 
   @GetMapping("/unauthorized")
   public String unauthorized(WebSession session) {
-    if (session.getAttribute(LineController.LINE_ID_TOKEN) != null) {
+    if (session.getAttribute(OAuth2.USER_PRINCIPAL) != null) {
       return REDIRECT_TO_INDEX;
     }
     return "unauthorized";
@@ -40,13 +41,13 @@ public class ViewController {
   }
 
   private String processView(WebSession session, Model model, String dest) {
-    var idToken = session.getAttribute(LineController.LINE_ID_TOKEN);
-    if (idToken == null) {
+    var userPrincipal = session.getAttribute(OAuth2.USER_PRINCIPAL);
+    if (userPrincipal == null) {
       log.warn("User hasn't logged in yet.");
       return VIEW_USERS_LOGIN;
     }
 
-    model.addAttribute("idToken", idToken);
+    model.addAttribute("userPrincipal", userPrincipal);
     return dest;
   }
 }
