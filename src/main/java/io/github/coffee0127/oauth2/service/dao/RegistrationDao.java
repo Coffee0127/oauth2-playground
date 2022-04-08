@@ -7,13 +7,13 @@ import reactor.core.publisher.Mono;
 
 public interface RegistrationDao {
 
-  Mono<List<Registration>> findAllRegistrations();
+  Mono<List<Registration>> findAll();
 
-  Mono<List<Registration>> findRegistrations(String userId);
+  Mono<List<Registration>> find(String userId);
 
-  Mono<Registration> saveRegistration(Registration registration);
+  Mono<Registration> findOne(RegistrationKey registrationKey);
 
-  Mono<Registration> getRegistration(RegistrationKey registrationKey);
+  Mono<Registration> save(Registration registration);
 
-  Mono<Void> deleteRegistration(RegistrationKey registrationKey);
+  Mono<Void> delete(RegistrationKey registrationKey);
 }

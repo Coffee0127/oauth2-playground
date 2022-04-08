@@ -30,7 +30,7 @@ public class RegistrationCaffeineDao implements RegistrationDao {
   }
 
   @Override
-  public Mono<List<Registration>> findAllRegistrations() {
+  public Mono<List<Registration>> findAll() {
     return Mono.just(
         storage.asMap().values().stream()
             .map(Map::entrySet)
@@ -41,7 +41,7 @@ public class RegistrationCaffeineDao implements RegistrationDao {
   }
 
   @Override
-  public Mono<List<Registration>> findRegistrations(String userId) {
+  public Mono<List<Registration>> find(String userId) {
     return Mono.just(
         storage.asMap().entrySet().stream()
             .filter(entry -> entry.getKey().equals(userId))
@@ -54,7 +54,7 @@ public class RegistrationCaffeineDao implements RegistrationDao {
   }
 
   @Override
-  public Mono<Registration> saveRegistration(Registration registration) {
+  public Mono<Registration> save(Registration registration) {
     return Mono.fromSupplier(
         () -> {
           var userId = registration.getRegistrationKey().getUserId();
@@ -68,14 +68,14 @@ public class RegistrationCaffeineDao implements RegistrationDao {
   }
 
   @Override
-  public Mono<Registration> getRegistration(RegistrationKey registrationKey) {
+  public Mono<Registration> findOne(RegistrationKey registrationKey) {
     return Mono.justOrEmpty(
         Optional.ofNullable(storage.getIfPresent(registrationKey.getUserId()))
             .flatMap(registrations -> Optional.ofNullable(registrations.get(registrationKey))));
   }
 
   @Override
-  public Mono<Void> deleteRegistration(RegistrationKey registrationKey) {
+  public Mono<Void> delete(RegistrationKey registrationKey) {
     return Mono.fromRunnable(
         () -> {
           var userId = registrationKey.getUserId();

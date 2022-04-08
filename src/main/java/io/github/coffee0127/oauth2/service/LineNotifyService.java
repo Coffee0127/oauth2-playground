@@ -20,11 +20,11 @@ public class LineNotifyService {
   private final RegistrationDao dao;
 
   public Mono<List<Registration>> findRegistrations() {
-    return dao.findAllRegistrations();
+    return dao.findAll();
   }
 
   public Mono<List<Registration>> findRegistrations(String userId) {
-    return dao.findRegistrations(userId);
+    return dao.find(userId);
   }
 
   public URI getRedirectUri(String state) {
@@ -42,20 +42,20 @@ public class LineNotifyService {
                     .map(
                         registrationKey ->
                             new Registration(registrationKey.setUserId(userId), accessToken))
-                    .flatMap(dao::saveRegistration));
+                    .flatMap(dao::save));
   }
 
   public Mono<Void> notify(RegistrationKey registrationKey, String message) {
-    return dao.getRegistration(registrationKey)
+    return dao.findOne(registrationKey)
         .map(Registration::getAccessToken)
         .flatMap(accessToken -> client.notify(accessToken, message))
         .then();
   }
 
   public Mono<Void> revoke(RegistrationKey registrationKey) {
-    return dao.getRegistration(registrationKey)
+    return dao.findOne(registrationKey)
         .map(Registration::getAccessToken)
         .flatMap(client::revokeAccessToken)
-        .flatMap(unused -> dao.deleteRegistration(registrationKey));
+        .flatMap(unused -> dao.delete(registrationKey));
   }
 }

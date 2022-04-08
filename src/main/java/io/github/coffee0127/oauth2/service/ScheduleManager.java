@@ -38,7 +38,7 @@ public class ScheduleManager {
                 .retry(5)
                 // TODO enhance retry mechanism
                 .doOnError(throwable -> log.error("Revoke access token failed..."))
-                .then(dao.deleteRegistration(registration.getRegistrationKey()))
+                .then(dao.delete(registration.getRegistrationKey()))
                 .block();
           }
         },
