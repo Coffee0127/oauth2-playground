@@ -31,4 +31,9 @@ public class UserCaffeineDao implements UserDao {
           return userPrincipal;
         });
   }
+
+  @Override
+  public Mono<Void> delete(String userId) {
+    return Mono.fromRunnable(() -> storage.invalidate(userId));
+  }
 }

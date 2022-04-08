@@ -7,4 +7,6 @@ public interface UserDao {
   Mono<UserPrincipal> find(String userId);
 
   Mono<UserPrincipal> save(UserPrincipal userPrincipal);
+
+  Mono<Void> delete(String userId);
 }

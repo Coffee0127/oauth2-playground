@@ -4,6 +4,9 @@ import io.github.coffee0127.oauth2.constant.ErrorCode;
 import io.github.coffee0127.oauth2.constant.OAuth2;
 import io.github.coffee0127.oauth2.controller.utils.RedirectUtils;
 import io.github.coffee0127.oauth2.objects.AccessTokenResponse;
+import io.github.coffee0127.oauth2.objects.Registration;
+import io.github.coffee0127.oauth2.objects.UserPrincipal;
+import io.github.coffee0127.oauth2.service.LineNotifyService;
 import io.github.coffee0127.oauth2.service.LineService;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @AllArgsConstructor
 @Slf4j
@@ -29,6 +34,8 @@ public class LineController {
   private static final String LINE_ACCESS_TOKEN = "LineController.LINE_ACCESS_TOKEN";
 
   private final LineService lineService;
+
+  private final LineNotifyService lineNotifyService;
 
   @GetMapping("/login")
   public Mono<Void> login(WebSession session, ServerHttpResponse response) {
@@ -49,6 +56,30 @@ public class LineController {
         .flatMap(lineService::revoke)
         .then(session.invalidate())
         .then(RedirectUtils.redirect(response, "/login"));
+  }
+
+  @GetMapping("/cleanUp")
+  public Mono<Void> cleanup(WebSession session, ServerHttpResponse response) {
+    return Mono.justOrEmpty(
+            Optional.ofNullable(session.<AccessTokenResponse>getAttribute(LINE_ACCESS_TOKEN))
+                .map(AccessTokenResponse::getAccessToken))
+        .flatMap(lineService::revoke)
+        .then(lineNotifyService.findRegistrations(getUserId(session)))
+        .flatMapMany(Flux::fromIterable)
+        .parallel()
+        .runOn(Schedulers.parallel())
+        .map(Registration::getRegistrationKey)
+        .flatMap(lineNotifyService::revoke)
+        .sequential()
+        .collectList()
+        .then(session.invalidate())
+        .then(RedirectUtils.redirect(response, "/login"));
+  }
+
+  private String getUserId(WebSession session) {
+    return Optional.ofNullable(session.<UserPrincipal>getAttribute(OAuth2.USER_PRINCIPAL))
+        .map(UserPrincipal::getUserId)
+        .orElseThrow(() -> new IllegalStateException("Cannot find User ID from session."));
   }
 
   @GetMapping("/auth")
