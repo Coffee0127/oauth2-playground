@@ -1,9 +1,10 @@
-package io.github.coffee0127.oauth2.service.dao;
+package io.github.coffee0127.oauth2.service.dao.caffeine;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.coffee0127.oauth2.objects.Registration;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
+import io.github.coffee0127.oauth2.service.dao.RegistrationDao;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,12 +20,12 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
-public class CaffeineRegistrationDao implements RegistrationDao {
+public class RegistrationCaffeineDao implements RegistrationDao {
 
   /** key is userId and value is registrations. */
   private final Cache<String, Map<RegistrationKey, Registration>> storage;
 
-  public CaffeineRegistrationDao() {
+  public RegistrationCaffeineDao() {
     storage = Caffeine.newBuilder().build();
   }
 
