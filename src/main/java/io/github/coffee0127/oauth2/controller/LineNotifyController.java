@@ -182,5 +182,6 @@ public class LineNotifyController {
     private String target;
     private Long expiryTime;
     private String userId;
+    private String userName;
   }
 }

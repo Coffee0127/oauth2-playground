@@ -111,14 +111,20 @@ public class LineController {
     }
 
     session.getAttributes().remove(LINE_LOGIN_NONCE);
-    var userPrincipal = lineService.parseIdToken(accessToken.getIdToken());
-    if (log.isDebugEnabled()) {
-      log.debug("userId : {}", userPrincipal.getUserId());
-      log.debug("displayName : {}", userPrincipal.getName());
-      log.debug("pictureUrl : {}", userPrincipal.getPicture());
-    }
-
-    session.getAttributes().put(OAuth2.USER_PRINCIPAL, userPrincipal);
-    return RedirectUtils.redirect(response, "/");
+    return lineService
+        .findUser(accessToken.getIdToken())
+        .doOnSuccess(
+            userPrincipal -> {
+              if (log.isDebugEnabled()) {
+                log.debug("userId : {}", userPrincipal.getUserId());
+                log.debug("displayName : {}", userPrincipal.getName());
+                log.debug("pictureUrl : {}", userPrincipal.getPicture());
+              }
+            })
+        .flatMap(
+            userPrincipal -> {
+              session.getAttributes().put(OAuth2.USER_PRINCIPAL, userPrincipal);
+              return RedirectUtils.redirect(response, "/");
+            });
   }
 }

@@ -2,10 +2,11 @@ package io.github.coffee0127.oauth2.controller;
 
 import io.github.coffee0127.oauth2.controller.LineNotifyController.NotifyRequest;
 import io.github.coffee0127.oauth2.controller.LineNotifyController.RegistrationResponse;
+import io.github.coffee0127.oauth2.objects.Registration;
 import io.github.coffee0127.oauth2.objects.RegistrationKey;
 import io.github.coffee0127.oauth2.service.LineNotifyService;
+import io.github.coffee0127.oauth2.service.UserService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -26,21 +27,33 @@ import reactor.core.scheduler.Schedulers;
 public class AdminLineNotifyController {
   private final LineNotifyService notifyService;
 
+  private final UserService userService;
+
   @GetMapping
   public Mono<List<RegistrationResponse>> list() {
     return notifyService
         .findRegistrations()
-        .map(
+        .flatMap(
             registrations ->
-                registrations.stream()
-                    .map(
-                        registration ->
-                            new RegistrationResponse()
-                                .setUserId(registration.getRegistrationKey().getUserId())
-                                .setTargetType(registration.getRegistrationKey().getTargetType())
-                                .setTarget(registration.getRegistrationKey().getTarget())
-                                .setExpiryTime(registration.getExpiryTime().toEpochMilli()))
-                    .collect(Collectors.toList()));
+                Flux.fromIterable(registrations)
+                    .parallel()
+                    .runOn(Schedulers.parallel())
+                    .flatMap(this::attachUserProfile)
+                    .sequential()
+                    .collectList());
+  }
+
+  private Mono<RegistrationResponse> attachUserProfile(Registration registration) {
+    return userService
+        .find(registration.getRegistrationKey().getUserId())
+        .map(
+            userPrincipal ->
+                new RegistrationResponse()
+                    .setUserId(registration.getRegistrationKey().getUserId())
+                    .setUserName(userPrincipal.getName())
+                    .setTargetType(registration.getRegistrationKey().getTargetType())
+                    .setTarget(registration.getRegistrationKey().getTarget())
+                    .setExpiryTime(registration.getExpiryTime().toEpochMilli()));
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

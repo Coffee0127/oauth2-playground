@@ -44,7 +44,7 @@ $(function () {
       ));
       $tr.append(
         $(document.createElement('th')).text(seqNo).attr('scope', 'row'));
-      $tr.append($(document.createElement('td')).text(registration.userId));
+      $tr.append($(document.createElement('td')).text(registration.userName));
       $tr.append($(document.createElement('td')).text(registration.targetType));
       $tr.append($(document.createElement('td')).text(registration.target));
       $tr.append($(document.createElement('td')).text(
