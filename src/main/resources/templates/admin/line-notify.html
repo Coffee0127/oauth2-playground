@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout::head(~{::title},~{::link},~{::script})">
+  <title>LINE Notify</title>
+  <link rel="stylesheet" th:href="@{/css/line-notify.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/admin/js/line-notify.js" async></script>
+</head>
+<body th:replace="layout::body(~{::.container})">
+<div class="container">
+  <div class="row">
+    <table id="registrations" class="table caption-top">
+      <caption>Notification Registrations</caption>
+      <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">#</th>
+        <th scope="col">UserId</th>
+        <th scope="col">Type</th>
+        <th scope="col">Target</th>
+        <th scope="col">Expiry <span id="timezone"></span></th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div>
+      <button type="button" id="notify-btn" class="notify-btn btn btn-primary notify-button"
+              disabled>Notify
+      </button>
+      <span id="notify-result" class="notify-result invisible">Message sent...</span>
+    </div>
+    <div class="mt-2">
+      <label for="notify-msg">Send message</label>
+      <textarea id="notify-msg" class="notify-msg form-control" rows="3" data-index="1"></textarea>
+    </div>
+  </div>
+</div>
+</body>
+</html>

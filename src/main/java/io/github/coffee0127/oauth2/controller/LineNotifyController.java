@@ -168,17 +168,19 @@ public class LineNotifyController {
   }
 
   @Data
-  private static class NotifyRequest {
+  static class NotifyRequest {
     private String type;
     private String target;
     private String msg;
+    private String userId;
   }
 
   @Accessors(chain = true)
   @Data
-  private static class RegistrationResponse {
+  static class RegistrationResponse {
     private String targetType;
     private String target;
     private Long expiryTime;
+    private String userId;
   }
 }

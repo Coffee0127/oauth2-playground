@@ -40,6 +40,11 @@ public class ViewController {
     return processView(session, model, "users/line-notify");
   }
 
+  @GetMapping("/admin/line-notify")
+  public String adminLineNotify(WebSession session, Model model) {
+    return processView(session, model, "admin/line-notify");
+  }
+
   private String processView(WebSession session, Model model, String dest) {
     var userPrincipal = session.getAttribute(OAuth2.USER_PRINCIPAL);
     if (userPrincipal == null) {

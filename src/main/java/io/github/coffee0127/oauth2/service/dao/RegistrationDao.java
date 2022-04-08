@@ -7,6 +7,8 @@ import reactor.core.publisher.Mono;
 
 public interface RegistrationDao {
 
+  Mono<List<Registration>> findAllRegistrations();
+
   Mono<List<Registration>> findRegistrations(String userId);
 
   Mono<Registration> saveRegistration(Registration registration);

@@ -29,6 +29,17 @@ public class CaffeineRegistrationDao implements RegistrationDao {
   }
 
   @Override
+  public Mono<List<Registration>> findAllRegistrations() {
+    return Mono.just(
+        storage.asMap().values().stream()
+            .map(Map::entrySet)
+            .flatMap(Collection::stream)
+            .map(Entry::getValue)
+            .map(Registration::new)
+            .collect(Collectors.toList()));
+  }
+
+  @Override
   public Mono<List<Registration>> findRegistrations(String userId) {
     return Mono.just(
         storage.asMap().entrySet().stream()

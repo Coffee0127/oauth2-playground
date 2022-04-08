@@ -11,6 +11,12 @@ button:disabled {
   pointer-events: all !important;
 }
 
+tr.registration:hover th,
+tr.registration:hover td {
+  background: #e3e7ea;
+  cursor: pointer;
+}
+
 tr.deleted th,
 tr.deleted td {
   background: #dc3545;

@@ -19,6 +19,10 @@ public class LineNotifyService {
   private final LineNotifyClient client;
   private final RegistrationDao dao;
 
+  public Mono<List<Registration>> findRegistrations() {
+    return dao.findAllRegistrations();
+  }
+
   public Mono<List<Registration>> findRegistrations(String userId) {
     return dao.findRegistrations(userId);
   }
