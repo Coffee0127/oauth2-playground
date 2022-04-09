@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -107,7 +106,7 @@ public class LineNotifyClient {
     return notificationWebClient
         .post()
         .uri("/notify")
-        .header(HttpHeaders.AUTHORIZATION, formatAccessToken(accessToken))
+        .headers(headers -> headers.setBearerAuth(accessToken))
         .bodyValue(formData)
         .retrieve()
         .bodyToMono(BasicResponse.class)
@@ -120,7 +119,7 @@ public class LineNotifyClient {
     return notificationWebClient
         .get()
         .uri("/status")
-        .header(HttpHeaders.AUTHORIZATION, formatAccessToken(accessToken))
+        .headers(headers -> headers.setBearerAuth(accessToken))
         .retrieve()
         .bodyToMono(StatusResponse.class)
         .map(
@@ -135,16 +134,12 @@ public class LineNotifyClient {
     return notificationWebClient
         .post()
         .uri("/revoke")
-        .header(HttpHeaders.AUTHORIZATION, formatAccessToken(accessToken))
+        .headers(headers -> headers.setBearerAuth(accessToken))
         .retrieve()
         .bodyToMono(BasicResponse.class)
         .filter(response -> HttpStatus.OK.value() == response.getStatus())
         .map(BasicResponse::getMessage)
         .doOnError(throwable -> log.error(throwable.getMessage(), throwable));
-  }
-
-  private String formatAccessToken(String accessToken) {
-    return "Bearer " + accessToken;
   }
 
   @Data
